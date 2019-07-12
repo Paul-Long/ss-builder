@@ -5,14 +5,18 @@ const config = {
   optimization: {
     minimize: true,
     noEmitOnErrors: true,
-    concatenateModules: true
+    concatenateModules: true,
+    namedModules: false,
+    namedChunks: false,
+    flagIncludedChunks: true,
+    occurrenceOrder: true,
+    sideEffects: true,
+    usedExports: true
   },
   plugins: [
-    new (require('webpack-bundle-analyzer')).BundleAnalyzerPlugin(),
     new CleanPlugin(['dist/*', 'build/*.*'], {
-      root: path.resolve('./dist'),
-      verbose: true,
-      exclude: ['echarts.min_2.0.0.js']
+      root: path.resolve('.'),
+      verbose: true
     })
   ]
 };

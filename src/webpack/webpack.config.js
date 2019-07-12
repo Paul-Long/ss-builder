@@ -12,7 +12,7 @@ const HappyThreadPool = HappyPack.ThreadPool({size: require('os').cpus().length}
 
 const node_modules = resolve('./node_modules');
 const antTheme = require(resolve(node_modules, 'ss-web-start')).antTheme;
-exports = module.exports = function({prefix, otherConfig}) {
+exports = module.exports = function({prefix, otherConfig, title}) {
   const asset = `${prefix}/static/`;
   const outputPath = resolve('./dist');
   const isDev = process.env.NODE_ENV === 'development';
@@ -23,6 +23,14 @@ exports = module.exports = function({prefix, otherConfig}) {
   antTheme['@form-item-margin-bottom'] = 0;
   antTheme['@icon-url'] = resolve(node_modules, 'ss-web-start/theme/antd-fonts/iconfont');
   antTheme['@ss-icon-url'] = resolve(node_modules, 'ss-web-start/theme/ss-fonts/iconfont');
+  function htmlOption(e) {
+    return {
+      ...otherConfig[e],
+      filename: `index.${e}.html`,
+      writeToDisk: true,
+      favicon: `${asset}favicon.ico`
+    };
+  }
 
   const config = {
     entry: resolve('./src'),
@@ -32,26 +40,37 @@ exports = module.exports = function({prefix, otherConfig}) {
       publicPath: '/',
       globalObject: 'self'
     },
-    resolve: {},
+    resolve: {
+      // modules: ['node_modules', resolve('./src'), resolve(__dirname, '../node_modules')],
+      // extensions: ['.web.js', '.web.jsx', '.web.ts', '.web.tsx', '.js', '.json', '.jsx', '.ts', '.tsx']
+    },
     externals: {},
     module: {
       rules: [
         {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
+          enforce: 'pre',
           use: 'happypack/loader?id=js'
         },
         {
           test: /worker\.js$/,
+          enforce: 'pre',
           use: {loader: 'worker-loader', options: {name: `${asset}js/fetch-worker.[hash:8].js`}}
         },
         {
           test: /\.(less|css)$/,
+          enforce: 'pre',
           use: ExtractTextPlugin.extract({
             fallback: 'style-loader',
             use: [
               'css-loader',
-              'postcss-loader',
+              {
+                loader: 'postcss-loader',
+                options: {
+                  plugins: [require('autoprefixer'), require('cssnano')]
+                }
+              },
               {
                 loader: 'less-loader',
                 options: {modifyVars: antTheme}
@@ -61,10 +80,12 @@ exports = module.exports = function({prefix, otherConfig}) {
         },
         {
           test: /\.(png|jpe?g|gif)$/,
+          enforce: 'pre',
           use: `url-loader?limit=100&name=${asset}images/[name].[hash:8].[ext]`
         },
         {
           test: /\.(ttf|svg|eot|woff)$/,
+          enforce: 'pre',
           use: `url-loader?limit=100&name=${asset}fonts/[name].[hash:8].[ext]`
         }
       ]
@@ -85,21 +106,48 @@ exports = module.exports = function({prefix, otherConfig}) {
       new HappyPack({
         id: 'js',
         threadPool: HappyThreadPool,
-        loaders: ['babel-loader'],
+        loaders: [
+          {
+            loader: 'babel-loader',
+            query: {
+              presets: ['env', 'react', 'flow', 'stage-0'],
+              plugins: [
+                'lodash',
+                'syntax-dynamic-import',
+                'transform-decorators-legacy',
+                [
+                  'import',
+                  {
+                    libraryName: 'antd',
+                    style: true
+                  }
+                ],
+                [
+                  'transform-runtime',
+                  {
+                    polyfill: false,
+                    regenerator: true
+                  }
+                ]
+              ]
+            }
+          }
+        ],
         verboseWhenProfiling: true
       }),
       new HtmlWebpackPlugin({
+        title,
         filename: 'index.html',
-        template: resolve('index.html'),
+        template: resolve(__dirname, 'index.html'),
         inject: true,
         minify: {
           removeComments: false,
           collapseWhitespace: isDev
         }
       }),
-      new HtmlStaticBeforePlugin({...otherConfig['dev'], filename: 'index.dev.html', writeToDisk: true}),
-      new HtmlStaticBeforePlugin({...otherConfig['qa'], filename: 'index.qa.html', writeToDisk: true}),
-      new HtmlStaticBeforePlugin({...otherConfig['prd'], filename: 'index.prd.html', writeToDisk: true}),
+      new HtmlStaticBeforePlugin(htmlOption('dev')),
+      new HtmlStaticBeforePlugin(htmlOption('qa')),
+      new HtmlStaticBeforePlugin(htmlOption('prd')),
       new HtmlStaticBeforePlugin({...otherConfig[BUILD_ENV]}),
       new CopyWebpackPlugin([
         {
@@ -108,8 +156,12 @@ exports = module.exports = function({prefix, otherConfig}) {
           ignore: ['*.less', '*.js']
         },
         {
-          from: resolve('favicon.ico'),
+          from: resolve(__dirname, 'favicon.ico'),
           to: resolve(outputPath, asset)
+        },
+        {
+          from: resolve(process.cwd(), 'conf'),
+          to: resolve(outputPath, 'conf')
         }
       ])
     ],
@@ -131,8 +183,7 @@ exports = module.exports = function({prefix, otherConfig}) {
           minChunks: 2,
           name: 'commons',
           maxInitialRequests: 5,
-          minSize: 0 // 默认是30kb，minSize设置为0之后
-          // 多次引用的utility1.js和utility2.js会被压缩到commons中
+          minSize: 0
         },
         base: {
           test: (module) => {
