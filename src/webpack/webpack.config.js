@@ -3,7 +3,6 @@ const webpack = require('webpack');
 const resolve = require('path').resolve;
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const LodashPlugin = require('lodash-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlStaticBeforePlugin = require('html-static-before-plugin');
@@ -92,7 +91,6 @@ exports = module.exports = function({prefix, otherConfig, title}) {
     },
     plugins: [
       new CaseSensitivePathsPlugin(),
-      new LodashPlugin(),
       new ExtractTextPlugin({filename: `${asset}css/[name].[hash:8].css`, allChunks: true}),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
