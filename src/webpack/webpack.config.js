@@ -27,7 +27,7 @@ exports = module.exports = function({prefix, otherConfig, title}) {
       ...otherConfig[e],
       filename: `index.${e}.html`,
       writeToDisk: true,
-      favicon: `${asset}favicon.ico`
+      favicon: `/${asset}favicon.ico`
     };
   }
 
