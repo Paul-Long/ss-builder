@@ -1,6 +1,6 @@
 {
   "name": "ss-builder",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "webpack builder",
   "scripts": {
     "build": "rm -rf lib && babel src --out-dir lib/src/ && babel scripts --out-dir lib/scripts/ && babel bin --out-dir lib/bin/"

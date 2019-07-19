@@ -15,6 +15,7 @@ exports = module.exports = function(program) {
       process.stdout.write(err + '\n');
     } else {
       printStats(stats);
+      process.stdout.write(stats.toString() + '\n');
     }
     console.log(chalk.green('Compiled successfully.\n'));
 
