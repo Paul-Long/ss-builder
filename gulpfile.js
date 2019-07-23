@@ -4,7 +4,7 @@ const shell = require('shelljs');
 
 gulp.task('build:js', function() {
   return gulp
-    .src(['src/webpack/*.js', 'bin/*.js', 'scripts/*.js'], {base: '.'})
+    .src(['src/index.js', 'src/webpack/*.js', 'bin/*.js', 'scripts/*.js'], {base: '.'})
     .pipe(
       babel({
         presets: ['@babel/preset-env'],
