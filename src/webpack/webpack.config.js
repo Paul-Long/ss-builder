@@ -110,12 +110,11 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
             query: {
               presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-flow'],
               plugins: [
-                'lodash',
                 ['@babel/plugin-proposal-decorators', {legacy: true}],
                 ['@babel/plugin-proposal-class-properties', {loose: true}],
                 '@babel/plugin-syntax-dynamic-import',
-                ...babelImport.map((bi) => ['import', {libraryName: bi}, bi]),
-                [('@babel/plugin-transform-runtime', {regenerator: true})]
+                ...babelImport.map((bi) => ['import', ...bi]),
+                ['@babel/plugin-transform-runtime', {regenerator: true}]
               ]
             }
           }

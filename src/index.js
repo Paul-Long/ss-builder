@@ -26,7 +26,7 @@ exports.printStats = function(stats) {
 exports.chartsOption = function(prefix, version) {};
 
 exports.getConfig = function(program) {
-  const allConfig = {babelImport: ['antd', 'lodash']};
+  const allConfig = {babelImport: [[{libraryName: 'antd', style: true}, 'antd'], [{libraryName: 'lodash'}, 'lodash']]};
   const pkg = JSON.parse(fs.readFileSync(join(process.cwd(), 'package.json')));
   const isDev = program.env === 'development';
   allConfig.version = pkg.version;
