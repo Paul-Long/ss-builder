@@ -1,14 +1,12 @@
 {
   "presets": [
-    "env",
-    "stage-0"
+    "@babel/preset-env"
   ],
   "plugins": [
-    "lodash",
     [
-      "transform-runtime",
+      "@babel/plugin-transform-runtime",
       {
-        "polyfill": false,
+        "corejs": false,
         "regenerator": true
       }
     ]

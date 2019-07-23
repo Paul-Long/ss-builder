@@ -11,7 +11,7 @@ const HappyThreadPool = HappyPack.ThreadPool({size: require('os').cpus().length}
 
 const node_modules = resolve('./node_modules');
 const antTheme = require(resolve(node_modules, 'ss-web-start')).antTheme;
-exports = module.exports = function({prefix, otherConfig, title}) {
+exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
   const asset = `${prefix}/static/`;
   const outputPath = resolve('./dist');
   const isDev = process.env.NODE_ENV === 'development';
@@ -108,25 +108,14 @@ exports = module.exports = function({prefix, otherConfig, title}) {
           {
             loader: 'babel-loader',
             query: {
-              presets: ['env', 'react', 'flow', 'stage-0'],
+              presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-flow'],
               plugins: [
                 'lodash',
-                'syntax-dynamic-import',
-                'transform-decorators-legacy',
-                [
-                  'import',
-                  {
-                    libraryName: 'antd',
-                    style: true
-                  }
-                ],
-                [
-                  'transform-runtime',
-                  {
-                    polyfill: false,
-                    regenerator: true
-                  }
-                ]
+                ['@babel/plugin-proposal-decorators', {legacy: true}],
+                ['@babel/plugin-proposal-class-properties', {loose: true}],
+                '@babel/plugin-syntax-dynamic-import',
+                ...babelImport.map((bi) => ['import', {libraryName: bi}, bi]),
+                [('@babel/plugin-transform-runtime', {regenerator: true})]
               ]
             }
           }

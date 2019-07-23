@@ -26,7 +26,7 @@ exports.printStats = function(stats) {
 exports.chartsOption = function(prefix, version) {};
 
 exports.getConfig = function(program) {
-  const allConfig = {};
+  const allConfig = {babelImport: ['antd', 'lodash']};
   const pkg = JSON.parse(fs.readFileSync(join(process.cwd(), 'package.json')));
   const isDev = program.env === 'development';
   allConfig.version = pkg.version;
@@ -36,6 +36,10 @@ exports.getConfig = function(program) {
     otherConfig = config.otherConfig;
     delete config.otherConfig;
   }
+  if (Object.prototype.hasOwnProperty.call(config, 'babelImport')) {
+    allConfig.babelImport = config.babelImport;
+    delete config.babelImport;
+  }
   if (config.echarts) {
     allConfig.echarts = config.echarts;
     delete config.echarts;
@@ -44,7 +48,8 @@ exports.getConfig = function(program) {
     env: program.env,
     prefix: program.prefix,
     title: program.title,
-    otherConfig
+    otherConfig,
+    babelImport: allConfig.babelImport
   });
   webpackConfig = merge(
     webpackConfig,

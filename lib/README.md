@@ -1,2 +1,0 @@
-# ss-builder
-webpack builder
