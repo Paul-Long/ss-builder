@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const resolve = require('path').resolve;
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlStaticBeforePlugin = require('html-static-before-plugin');
 const HappyPack = require('happypack');
@@ -20,6 +20,13 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
   antTheme['@menu-dark-submenu-bg'] = '#121A19';
   antTheme['@form-component-max-height'] = 32;
   antTheme['@form-item-margin-bottom'] = 0;
+  antTheme['@btn-height-base'] = '24px';
+  antTheme['@btn-height-sm'] = '22px';
+  antTheme['@input-height-sm'] = '22px';
+  antTheme['@collapse-header-bg'] = '#193D37';
+  antTheme['@collapse-content-bg'] = '#0A0F0E';
+  antTheme['@collapse-header-padding'] = '8px 0 8px 16px';
+  antTheme['@collapse-content-padding'] = '0';
   antTheme['@icon-url'] = resolve(node_modules, 'ss-web-start/theme/antd-fonts/iconfont');
   antTheme['@ss-icon-url'] = resolve(node_modules, 'ss-web-start/theme/ss-fonts/iconfont');
   function htmlOption(e) {
@@ -60,22 +67,20 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
         {
           test: /\.(less|css)$/,
           enforce: 'pre',
-          use: ExtractTextPlugin.extract({
-            fallback: 'style-loader',
-            use: [
-              'css-loader',
-              {
-                loader: 'postcss-loader',
-                options: {
-                  plugins: [require('autoprefixer'), require('cssnano')]
-                }
-              },
-              {
-                loader: 'less-loader',
-                options: {modifyVars: antTheme}
+          use: [
+            MiniCssExtractPlugin.loader,
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: [require('autoprefixer'), require('cssnano')]
               }
-            ]
-          })
+            },
+            {
+              loader: 'less-loader',
+              options: {modifyVars: antTheme}
+            }
+          ]
         },
         {
           test: /\.(png|jpe?g|gif)$/,
@@ -91,7 +96,11 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
     },
     plugins: [
       new CaseSensitivePathsPlugin(),
-      new ExtractTextPlugin({filename: `${asset}css/[name].[hash:8].css`, allChunks: true}),
+      new MiniCssExtractPlugin({
+        filename: `${asset}css/[name].[hash:8].css`,
+        chunkFilename: `${asset}css/[id].[hash:8].css`,
+        ignoreOrder: false // Enable to remove warnings about conflicting order
+      }),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
         'process.env.RUN_ENV': JSON.stringify(BUILD_ENV)
@@ -165,26 +174,19 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
       chunks: 'all',
       cacheGroups: {
         commons: {
-          chunks: 'initial',
+          chunks: 'all',
           minChunks: 2,
           name: 'commons',
           maxInitialRequests: 5,
+          priority: 20,
           minSize: 0
         },
         base: {
-          test: (module) => {
-            return /redux|prop-types|lodash|moment|fast-table/.test(module.context);
+          test: function test(module) {
+            return /redux|prop-types|lodash|antd|fast-table|moment/.test(module.context);
           },
-          chunks: 'initial',
+          chunks: 'async',
           name: 'base',
-          priority: 10
-        },
-        antd: {
-          test: (module) => {
-            return /antd/.test(module.context);
-          },
-          chunks: 'initial',
-          name: 'antd',
           priority: 10
         }
       }

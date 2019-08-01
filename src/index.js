@@ -37,7 +37,7 @@ exports.getConfig = function(program) {
     delete config.otherConfig;
   }
   if (Object.prototype.hasOwnProperty.call(config, 'babelImport')) {
-    allConfig.babelImport = config.babelImport;
+    allConfig.babelImport = [...allConfig.babelImport, ...config.babelImport];
     delete config.babelImport;
   }
   if (config.echarts) {
