@@ -1,6 +1,6 @@
 {
   "name": "ss-builder",
-  "version": "1.0.7-beta.5",
+  "version": "1.0.7-beta.6",
   "description": "webpack builder",
   "scripts": {
     "build": "gulp build",
