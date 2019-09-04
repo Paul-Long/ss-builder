@@ -187,7 +187,7 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
           test: function test(module) {
             return /redux|prop-types|lodash|antd|fast-table|moment/.test(module.context);
           },
-          chunks: 'async',
+          chunks: 'all',
           name: 'base',
           priority: 10
         }
