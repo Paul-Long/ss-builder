@@ -7,7 +7,7 @@ program
   .option('--config <config>', 'webpack config')
   .option('--env <env>', 'NODE_ENV', 'development')
   .option('--prefix <prefix>', 'app url prefix')
-  .option('--title <title>', 'web title', 'App')
+  .option('--title <title>', 'web title', '')
   .action(function(p) {
     p.env = p.env || 'development';
     if (!p.prefix) {

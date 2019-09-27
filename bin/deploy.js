@@ -7,7 +7,7 @@ program
   .option('--config <config>', 'webpack config file, isRequired')
   .option('--env <env>', 'NODE_ENV', 'production')
   .option('--prefix <prefix>', 'project web url prefix, isRequired')
-  .option('--title <title>', 'web app title', 'App')
+  .option('--title <title>', 'web app title', '')
   .option('--analyzer', 'analysis webpack build package, only deploy')
   .option('--tar', 'build tar.gz file, only deploy', true)
   .action(function(p) {
