@@ -175,21 +175,19 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
+        base: {
+          test: /[\\/]node_modules[\\/](lodash|antd|fast-table|moment|rc-)/,
+          chunks: 'all',
+          name: 'base',
+          priority: 20
+        },
         commons: {
           chunks: 'all',
           minChunks: 2,
           name: 'commons',
           maxInitialRequests: 5,
-          priority: 20,
+          priority: 10,
           minSize: 0
-        },
-        base: {
-          test: function test(module) {
-            return /redux|prop-types|lodash|antd|fast-table|moment/.test(module.context);
-          },
-          chunks: 'all',
-          name: 'base',
-          priority: 10
         }
       }
     }
