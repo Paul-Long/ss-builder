@@ -142,9 +142,6 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
           collapseWhitespace: isDev
         }
       }),
-      new HtmlStaticBeforePlugin(htmlOption('dev')),
-      new HtmlStaticBeforePlugin(htmlOption('qa')),
-      new HtmlStaticBeforePlugin(htmlOption('prd')),
       new HtmlStaticBeforePlugin({...otherConfig[BUILD_ENV]}),
       new CopyWebpackPlugin([
         {
@@ -170,6 +167,7 @@ exports = module.exports = function({prefix, otherConfig, title, babelImport}) {
       child_process: 'empty'
     }
   };
+  Object.keys(otherConfig || {}).forEach(k => config.plugins.push(new HtmlStaticBeforePlugin(htmlOption(k))));
   config.mode = isDev ? 'development' : 'production';
   config.optimization = {
     splitChunks: {
